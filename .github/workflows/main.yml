@@ -10,12 +10,8 @@ jobs:
     name: Build APK
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: agenda-voz-clean
-
     steps:
-      - name: Descargar código
+      - name: Descargar codigo
         uses: actions/checkout@v4
 
       - name: Configurar Node.js
@@ -25,12 +21,14 @@ jobs:
 
       - name: Instalar dependencias
         run: npm install
+        working-directory: agenda-voz-clean
 
       - name: Instalar EAS CLI
         run: npm install -g eas-cli
 
       - name: Compilar APK con EAS
         run: eas build -p android --profile preview --non-interactive --output ../agenda-voz.apk
+        working-directory: agenda-voz-clean
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
@@ -40,24 +38,3 @@ jobs:
           name: agenda-voz-apk
           path: "*.apk"
           retention-days: 30
-```
-
----
-
-### Opción B — Más limpia: mover los archivos a la raíz
-
-En GitHub, los archivos deberían estar así:
-```
-/ (raíz del repo)
-├── App.js
-├── package.json
-├── app.json
-├── eas.json
-...
-```
-
-En vez de:
-```
-/agenda-voz-clean/App.js
-/agenda-voz-clean/package.json
-...
