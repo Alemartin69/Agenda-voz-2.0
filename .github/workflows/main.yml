@@ -32,7 +32,8 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Generar keystore
+      - name: Generar keystore y credentials.json
+        working-directory: agenda-voz-clean
         run: |
           keytool -genkeypair -v \
             -keystore agenda-voz.keystore \
@@ -42,13 +43,7 @@ jobs:
             -storepass android123 \
             -keypass android123 \
             -dname "CN=Agenda Voz, OU=App, O=App, L=Buenos Aires, S=BA, C=AR"
-          cp agenda-voz.keystore agenda-voz-clean/agenda-voz.keystore
-        working-directory: ${{ github.workspace }}
-
-      - name: Crear credentials.json
-        run: |
-          KEYSTORE_B64=$(base64 -w 0 agenda-voz.keystore)
-          cat > agenda-voz-clean/credentials.json << CREDS
+          cat > credentials.json << 'CREDS'
           {
             "android": {
               "keystore": {
@@ -60,7 +55,6 @@ jobs:
             }
           }
           CREDS
-        working-directory: ${{ github.workspace }}
 
       - name: Compilar APK local
         run: eas build -p android --profile preview --non-interactive --local --output ${{ github.workspace }}/agenda-voz.apk
