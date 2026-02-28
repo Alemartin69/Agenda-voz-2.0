@@ -20,14 +20,20 @@ jobs:
           node-version: 20
 
       - name: Instalar dependencias
-        run: npm install
+        run: npm install --legacy-peer-deps
         working-directory: agenda-voz-clean
 
       - name: Instalar EAS CLI
         run: npm install -g eas-cli
 
-      - name: Compilar APK con EAS
-        run: eas build -p android --profile preview --non-interactive --output ../agenda-voz.apk
+      - name: Inicializar proyecto EAS
+        run: eas init --force --non-interactive
+        working-directory: agenda-voz-clean
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Compilar APK local
+        run: eas build -p android --profile preview --non-interactive --local --output ${{ github.workspace }}/agenda-voz.apk
         working-directory: agenda-voz-clean
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -36,5 +42,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: agenda-voz-apk
-          path: "*.apk"
+          path: agenda-voz.apk
           retention-days: 30
